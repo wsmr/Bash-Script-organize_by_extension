@@ -60,4 +60,4 @@ organize_by_extension() {
   echo "✅ Organized by extension in: $dir"
 }
 
-
+### Then use it anytime like: organize_by_extension ~/Downloads/mix
