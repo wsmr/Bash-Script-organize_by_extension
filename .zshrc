@@ -46,3 +46,18 @@ echo "✅ Done organizing files by type."
 
 # ⸻
 # Wrap it into a function in .zshrc for reuse <---- zsh-compatible uppercase conversion: #!/bin/bash
+
+organize_by_extension() {
+  local dir="${1:-.}"
+  cd "$dir" || return
+  for f in *.*; do
+    [[ -f "$f" ]] || continue
+    ext="${f##*.}"
+    ext_upper="${(U)ext}"
+    mkdir -p "$ext_upper"
+    mv -- "$f" "$ext_upper/"
+  done
+  echo "✅ Organized by extension in: $dir"
+}
+
+
