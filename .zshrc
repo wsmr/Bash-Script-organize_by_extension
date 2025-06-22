@@ -1,5 +1,5 @@
 # Quick One-Liner Command (for current folder)
-for f in *.*; do ext="${f##*.}"; mkdir -p "${ext^^}"; mv -- "$f" "${ext^^}/"; done
+# for f in *.*; do ext="${f##*.}"; mkdir -p "${ext^^}"; mv -- "$f" "${ext^^}/"; done
 
 # 🔹 What this does:
 # 	•	Loops over all files with an extension.
@@ -11,6 +11,14 @@ for f in *.*; do ext="${f##*.}"; mkdir -p "${ext^^}"; mv -- "$f" "${ext^^}/"; do
 # 	•	Only works in the current directory.
 # 	•	Won’t recurse into subdirectories.
 # 	•	Will overwrite files if duplicates exist (unless enhanced).
+# ⸻
+
+for f in *.*; do
+  ext="${f##*.}"
+  ext_upper="${(U)ext}"       # zsh way to uppercase
+  mkdir -p "$ext_upper"
+  mv -- "$f" "$ext_upper/"
+done
 
 
 # ⸻
