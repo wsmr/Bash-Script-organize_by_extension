@@ -56,7 +56,7 @@ organize_by_extension() {
   find "$root_dir" -type f | while read -r file; do
     [[ "$(basename "$file")" == .* ]] && continue
 
-    # Skip files already in extension folders
+    # Skip files already inside type folders
     rel_path="${file#$root_dir/}"
     top_folder="${rel_path%%/*}"
     [[ -d "$root_dir/$top_folder" && "$top_folder" =~ ^[A-Z0-9]{2,5}$ ]] && continue
@@ -73,27 +73,23 @@ organize_by_extension() {
     mkdir -p "$dest_dir"
 
     if [[ -e "$dest_file" ]]; then
-      # Compare file content using shasum (fallback safe check)
+      # Check if content is exactly the same
       incoming_hash=$(shasum "$file" | awk '{print $1}')
       existing_hash=$(shasum "$dest_file" | awk '{print $1}')
 
       if [[ "$incoming_hash" == "$existing_hash" ]]; then
-        echo "⚠️  Skipping duplicate (same content): $file"
+        echo "🗑️  Duplicate found and removed: $file"
+        rm "$file"
         continue
       else
-        # Conflict: different content, move to EXISTING
-        existing_dir="$root_dir/EXISTING/$ext_upper"
-        mkdir -p "$existing_dir"
-
-        conflict_name="$existing_dir/$filename"
+        # Conflict: different content, rename and move
         count=1
-        while [[ -e "$conflict_name" ]]; do
-          conflict_name="$existing_dir/${base}_$count.$ext"
+        while [[ -e "$dest_dir/${base}_$count.$ext" ]]; do
           ((count++))
         done
-
-        mv "$file" "$conflict_name"
-        echo "📁 Conflict file moved to: $conflict_name"
+        new_name="${base}_$count.$ext"
+        mv "$file" "$dest_dir/$new_name"
+        echo "📁 Conflict moved and renamed: $file → $dest_dir/$new_name"
         continue
       fi
     fi
@@ -103,7 +99,7 @@ organize_by_extension() {
     echo "✅ Moved: $file → $dest_file"
   done
 
-  echo "🎉 Done organizing with conflict protection into 'EXISTING/'."
+  echo "🎉 Done organizing with true deduplication + renaming."
 }
 
 
