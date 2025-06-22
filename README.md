@@ -47,7 +47,7 @@ chmod +x organize_by_extension.sh
 ### Method 2: Clone Repository
 ```bash
 git clone https://github.com/wsmr/Script-Bash-organize_by_extension.git
-cd YOUR_REPO
+cd Script-Bash-organize_by_extension
 chmod +x organize_by_extension.sh
 ```
 
@@ -458,7 +458,7 @@ calculate_file_hash() {
 ### Development Setup
 ```bash
 git clone https://github.com/wsmr/Script-Bash-organize_by_extension.git
-cd YOUR_REPO
+cd Script-Bash-organize_by_extension
 
 # Create development branch
 git checkout -b feature/your-feature-name
@@ -522,7 +522,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Issues**: [GitHub Issues](https://github.com/wsmr/Script-Bash-organize_by_extension/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/wsmr/Script-Bash-organize_by_extension/discussions)
-- **Email**: your.email@domain.com
+[//]: # (- **Email**: your.email@domain.com)
 
 ---
 
