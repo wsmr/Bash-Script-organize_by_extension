@@ -522,7 +522,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Issues**: [GitHub Issues](https://github.com/wsmr/Script-Bash-organize_by_extension/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/wsmr/Script-Bash-organize_by_extension/discussions)
-[//]: # (- **Email**: your.email@domain.com)
+[//]: # (## - **Email**: your.email@domain.com)
 
 ---
 
