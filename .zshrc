@@ -52,27 +52,51 @@ organize_by_extension() {
   cd "$root_dir" || { echo "❌ Directory not found: $root_dir"; return 1; }
 
   echo "📂 Recursively organizing files in: $root_dir"
-  
-  # Use find to locate all regular files (excluding the ones in the categorized folders we'll create)
-  find "$root_dir" -type f | while read -r file; do
-    # Skip files inside already created extension folders to avoid infinite move loops
-    rel_path="${file#$root_dir/}"
-    if [[ "$rel_path" == */* ]]; then
-      top_folder="${rel_path%%/*}"
-      [[ -d "$root_dir/$top_folder" && "$top_folder" =~ ^[A-Z0-9]{2,5}$ ]] && continue
-    fi
 
-    # Get extension and convert to uppercase
+  find "$root_dir" -type f | while read -r file; do
+    # Skip hidden files and files in already-created extension folders
+    [[ "$(basename "$file")" == .* ]] && continue
+    rel_path="${file#$root_dir/}"
+    top_folder="${rel_path%%/*}"
+    [[ -d "$root_dir/$top_folder" && "$top_folder" =~ ^[A-Z0-9]{2,5}$ ]] && continue
+
+    # Get filename, extension
     filename="$(basename "$file")"
+    base="${filename%.*}"
     ext="${filename##*.}"
     [[ "$ext" == "$filename" ]] && continue  # Skip files without extension
 
     ext_upper="${(U)ext}"
-    mkdir -p "$root_dir/$ext_upper"
-    mv "$file" "$root_dir/$ext_upper/" 2>/dev/null
+    dest_dir="$root_dir/$ext_upper"
+    dest_file="$dest_dir/$filename"
+
+    mkdir -p "$dest_dir"
+
+    if [[ -e "$dest_file" ]]; then
+      # Compare size
+      orig_size=$(stat -f %z "$file")
+      existing_size=$(stat -f %z "$dest_file")
+      if [[ "$orig_size" -ne "$existing_size" ]]; then
+        # Generate new filename with counter
+        count=1
+        while true; do
+          new_name="${base}_$count.$ext"
+          dest_file="$dest_dir/$new_name"
+          [[ -e "$dest_file" ]] || break
+          ((count++))
+        done
+      else
+        # Same name and size, likely duplicate
+        echo "⚠️  Skipping duplicate: $file"
+        continue
+      fi
+    fi
+
+    mv "$file" "$dest_file"
+    echo "✅ Moved: $file → $dest_file"
   done
 
-  echo "✅ Done organizing files (recursively) into extension folders at: $root_dir"
+  echo "🎉 Done organizing files with safe conflict handling."
 }
 
 # Apply the change without restarting terminal: source ~/.zshrc
