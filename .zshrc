@@ -54,13 +54,13 @@ organize_by_extension() {
   echo "📂 Recursively organizing files in: $root_dir"
 
   find "$root_dir" -type f | while read -r file; do
-    # Skip hidden files and files in already-created extension folders
     [[ "$(basename "$file")" == .* ]] && continue
+
+    # Skip files already in extension folders
     rel_path="${file#$root_dir/}"
     top_folder="${rel_path%%/*}"
     [[ -d "$root_dir/$top_folder" && "$top_folder" =~ ^[A-Z0-9]{2,5}$ ]] && continue
 
-    # Get filename, extension
     filename="$(basename "$file")"
     base="${filename%.*}"
     ext="${filename##*.}"
@@ -73,31 +73,52 @@ organize_by_extension() {
     mkdir -p "$dest_dir"
 
     if [[ -e "$dest_file" ]]; then
-      # Compare size
-      orig_size=$(stat -f %z "$file")
-      existing_size=$(stat -f %z "$dest_file")
-      if [[ "$orig_size" -ne "$existing_size" ]]; then
-        # Generate new filename with counter
+      # Compare file content using shasum (fallback safe check)
+      incoming_hash=$(shasum "$file" | awk '{print $1}')
+      existing_hash=$(shasum "$dest_file" | awk '{print $1}')
+
+      if [[ "$incoming_hash" == "$existing_hash" ]]; then
+        echo "⚠️  Skipping duplicate (same content): $file"
+        continue
+      else
+        # Conflict: different content, move to EXISTING
+        existing_dir="$root_dir/EXISTING/$ext_upper"
+        mkdir -p "$existing_dir"
+
+        conflict_name="$existing_dir/$filename"
         count=1
-        while true; do
-          new_name="${base}_$count.$ext"
-          dest_file="$dest_dir/$new_name"
-          [[ -e "$dest_file" ]] || break
+        while [[ -e "$conflict_name" ]]; do
+          conflict_name="$existing_dir/${base}_$count.$ext"
           ((count++))
         done
-      else
-        # Same name and size, likely duplicate
-        echo "⚠️  Skipping duplicate: $file"
+
+        mv "$file" "$conflict_name"
+        echo "📁 Conflict file moved to: $conflict_name"
         continue
       fi
     fi
 
+    # Normal move
     mv "$file" "$dest_file"
     echo "✅ Moved: $file → $dest_file"
   done
 
-  echo "🎉 Done organizing files with safe conflict handling."
+  echo "🎉 Done organizing with conflict protection into 'EXISTING/'."
 }
+
 
 # Apply the change without restarting terminal: source ~/.zshrc
 ### Then use it anytime like: organize_by_extension ~/Downloads/mix
+
+# JPG/cat.jpg ← first copyEXISTING/JPG/cat.jpg ← second one (moved here due to content conflict) | Skipping duplicate (same content)
+# shasum — Checks File Content Uniquely
+## incoming_hash=$(shasum "$file" | awk '{print $1}')
+## existing_hash=$(shasum "$dest_file" | awk '{print $1}')
+# It calculates a SHA-1 checksum for each file. That checksum:
+# 	•	Is generated based on entire file content (byte-by-byte)
+# 	•	Even if only one pixel changes in an image, the checksum will be different
+# 	•	So even same-named, same-sized JPEGs will be identified as different, if their content differs
+# If you want even stronger certainty, you could use shasum -a 256 (SHA-256) or md5.
+## incoming_hash=$(shasum -a 256 "$file" | awk '{print $1}')
+## existing_hash=$(shasum -a 256 "$dest_file" | awk '{print $1}')
+
