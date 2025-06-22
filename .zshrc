@@ -48,20 +48,31 @@ echo "✅ Done organizing files by type."
 # Wrap it into a function in .zshrc for reuse <---- zsh-compatible uppercase conversion: #!/bin/bash
 
 organize_by_extension() {
-  local dir="${1:-.}"
-  cd "$dir" || { echo "❌ Directory not found: $dir"; return 1; }
+  local root_dir="${1:-.}"
+  cd "$root_dir" || { echo "❌ Directory not found: $root_dir"; return 1; }
 
-  echo "📁 Organizing files in: $dir"
+  echo "📂 Recursively organizing files in: $root_dir"
+  
+  # Use find to locate all regular files (excluding the ones in the categorized folders we'll create)
+  find "$root_dir" -type f | while read -r file; do
+    # Skip files inside already created extension folders to avoid infinite move loops
+    rel_path="${file#$root_dir/}"
+    if [[ "$rel_path" == */* ]]; then
+      top_folder="${rel_path%%/*}"
+      [[ -d "$root_dir/$top_folder" && "$top_folder" =~ ^[A-Z0-9]{2,5}$ ]] && continue
+    fi
 
-  for f in *.*; do
-    [[ -f "$f" ]] || continue  # Skip if not a regular file
-    ext="${f##*.}"
-    ext_upper="${(U)ext}"     # ZSH: convert to UPPERCASE
-    mkdir -p "$ext_upper"
-    mv -- "$f" "$ext_upper/"
+    # Get extension and convert to uppercase
+    filename="$(basename "$file")"
+    ext="${filename##*.}"
+    [[ "$ext" == "$filename" ]] && continue  # Skip files without extension
+
+    ext_upper="${(U)ext}"
+    mkdir -p "$root_dir/$ext_upper"
+    mv "$file" "$root_dir/$ext_upper/" 2>/dev/null
   done
 
-  echo "✅ Done organizing files by extension."
+  echo "✅ Done organizing files (recursively) into extension folders at: $root_dir"
 }
 
 # Apply the change without restarting terminal: source ~/.zshrc
