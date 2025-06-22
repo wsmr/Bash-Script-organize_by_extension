@@ -49,15 +49,20 @@ echo "✅ Done organizing files by type."
 
 organize_by_extension() {
   local dir="${1:-.}"
-  cd "$dir" || return
+  cd "$dir" || { echo "❌ Directory not found: $dir"; return 1; }
+
+  echo "📁 Organizing files in: $dir"
+
   for f in *.*; do
-    [[ -f "$f" ]] || continue
+    [[ -f "$f" ]] || continue  # Skip if not a regular file
     ext="${f##*.}"
-    ext_upper="${(U)ext}"
+    ext_upper="${(U)ext}"     # ZSH: convert to UPPERCASE
     mkdir -p "$ext_upper"
     mv -- "$f" "$ext_upper/"
   done
-  echo "✅ Organized by extension in: $dir"
+
+  echo "✅ Done organizing files by extension."
 }
 
+# Apply the change without restarting terminal: source ~/.zshrc
 ### Then use it anytime like: organize_by_extension ~/Downloads/mix
