@@ -38,7 +38,7 @@ A powerful and intelligent file organization tool that automatically categorizes
 ### Method 1: Direct Download
 ```bash
 # Download the script
-curl -O https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/organize_by_extension.sh
+curl -O https://raw.githubusercontent.com/wsmr/Script-Bash-organize_by_extension/main/organize_by_extension.sh
 
 # Make it executable
 chmod +x organize_by_extension.sh
@@ -46,7 +46,7 @@ chmod +x organize_by_extension.sh
 
 ### Method 2: Clone Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+git clone https://github.com/wsmr/Script-Bash-organize_by_extension.git
 cd YOUR_REPO
 chmod +x organize_by_extension.sh
 ```
@@ -457,7 +457,7 @@ calculate_file_hash() {
 
 ### Development Setup
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+git clone https://github.com/wsmr/Script-Bash-organize_by_extension.git
 cd YOUR_REPO
 
 # Create development branch
@@ -520,8 +520,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/YOUR_REPO/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/YOUR_USERNAME/YOUR_REPO/discussions)
+- **Issues**: [GitHub Issues](https://github.com/wsmr/Script-Bash-organize_by_extension/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/wsmr/Script-Bash-organize_by_extension/discussions)
 - **Email**: your.email@domain.com
 
 ---
